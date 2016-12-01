@@ -51,8 +51,8 @@ def get_task_vars(task_files):
             for line in task:
                 match = re.search(regex, line)
                 if match and "item" not in match.group():
-                    if match.group() not in task_vars:
-                        v = match.group()[3:-3]
+                    v = match.group()[3:-3]
+                    if v not in task_vars and "lookup" not in v:
                         task_vars.append(v)
     return task_vars
 
@@ -63,8 +63,8 @@ def get_template_vars(template_files):
             for line in template:
                 match = re.search(regex, line)
                 if match and "item" not in match.group():
-                    if match.group() not in template_vars:
-                        v = match.group()[3:-3]
+                    v = match.group()[3:-3]
+                    if v not in template_vars and "lookup" not in v:
                         template_vars.append(v)
     return template_vars
 
@@ -95,18 +95,17 @@ if __name__ == '__main__':
     if not conf_vars:
         print "There are no configuration variables to test against"
         exit(1)
-
     ta_vars = get_task_vars(ta_files)
     te_vars = get_template_vars(te_files)
+    t_vars = ta_vars + te_vars
 
-    if te_vars:
-        compare_vars(conf_vars,te_vars)
-    if ta_vars:
-        compare_vars(conf_vars,ta_vars)
+    if t_vars:
+        compare_vars(conf_vars,t_vars)
 
     if missing_vars:
         print "Variables missing matches:"
         for v in missing_vars:
-            print v
+            if "." not in v:
+                print v
     else:
         print "All your variables are accounted for"
