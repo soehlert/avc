@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import sys
 import argparse
 import os.path
 import yaml
 import re
 
 regex = re.compile(r"\{\{.*\}\}")
-var_dirs = [ "vars", "defaults" ]
+var_dirs = ["vars", "defaults"]
 conf_files = []
 conf_vars = []
 template_files = []
@@ -17,9 +16,9 @@ task_vars = []
 missing_vars = []
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-r", "--role", help="Specify role to check against", dest='role_dir')
-parser.add_argument("-g", "--group_vars", help="Specify group_vars to check against", nargs="*", dest='group_vars')
-parser.add_argument("--version", help="Print version", action="version", version="%(prog)s 0.1.0-alpha")
+parser.add_argument("-r", "--role", help="Specify role to check against", dest='role_dir') # noqa E501
+parser.add_argument("-g", "--group_vars", help="Specify group_vars to check against", nargs="*", dest='group_vars') # noqa E501
+parser.add_argument("--version", help="Print version", action="version", version="%(prog)s 0.1.0-alpha") # noqa E501
 args = parser.parse_args()
 
 role = args.role_dir
@@ -29,10 +28,11 @@ if groups:
     for group in groups:
         conf_files.append(group)
 
+
 def get_vars_files(role_dir):
     """ Function to grab all the files we will need """
     for dirpath, dirnames, filenames in os.walk(role):
-        for filename in [f for f in filenames if f.endswith(".yaml") or f.endswith(".yml")]:
+        for filename in [f for f in filenames if f.endswith(".yaml") or f.endswith(".yml")]: # noqa E501
             for x in var_dirs:
                 if x in dirpath:
                     conf_files.append(os.path.join(dirpath, filename))
@@ -43,6 +43,7 @@ def get_vars_files(role_dir):
                 template_files.append(os.path.join(dirpath, filename))
 
     return conf_files, task_files, template_files
+
 
 def get_task_vars(task_files):
     """ Grab all variables from task files """
@@ -56,6 +57,7 @@ def get_task_vars(task_files):
                         task_vars.append(v)
     return task_vars
 
+
 def get_template_vars(template_files):
     """ Grab all variables from template files """
     for f in template_files:
@@ -68,15 +70,17 @@ def get_template_vars(template_files):
                         template_vars.append(v)
     return template_vars
 
+
 def get_conf_vars(conf_files):
     """ Check group variable files """
     for fn in conf_files:
         with open(fn) as stream:
             yaml_vars = yaml.load(stream)
             if yaml_vars:
-                for k,v in yaml_vars.items():
+                for k, v in yaml_vars.items():
                     conf_vars.append(k)
     return conf_vars
+
 
 def compare_vars(conf_vars, t_vars):
     """ Checks to see if you have any missing variables """
@@ -89,6 +93,7 @@ def compare_vars(conf_vars, t_vars):
         if "ansible" not in v:
             missing_vars.append(v)
 
+
 if __name__ == '__main__':
     c_files, ta_files, te_files = get_vars_files(role)
     conf_vars = get_conf_vars(c_files)
@@ -100,7 +105,7 @@ if __name__ == '__main__':
     t_vars = ta_vars + te_vars
 
     if t_vars:
-        compare_vars(conf_vars,t_vars)
+        compare_vars(conf_vars, t_vars)
 
     if missing_vars:
         print "Variables missing matches:"
