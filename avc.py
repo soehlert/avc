@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import sys
 import argparse
 import os.path
 import yaml
 import re
 
 regex = re.compile(r"\{\{.*\}\}")
-var_dirs = [ "vars", "defaults" ]
+var_dirs = ["vars", "defaults"]
 conf_files = []
 conf_vars = []
 template_files = []
@@ -72,9 +71,9 @@ def get_conf_vars(conf_files):
     """ Check group variable files """
     for fn in conf_files:
         with open(fn) as stream:
-            yaml_vars = yaml.load(stream)
+            yaml_vars = yaml.safe_load(stream)
             if yaml_vars:
-                for k,v in yaml_vars.items():
+                for k, v in yaml_vars.items():
                     conf_vars.append(k)
     return conf_vars
 
@@ -100,7 +99,7 @@ if __name__ == '__main__':
     t_vars = ta_vars + te_vars
 
     if t_vars:
-        compare_vars(conf_vars,t_vars)
+        compare_vars(conf_vars, t_vars)
 
     if missing_vars:
         print "Variables missing matches:"
